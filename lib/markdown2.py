@@ -1753,7 +1753,7 @@ class Markdown(object):
                 lexer_name = lexer_name[3:].strip()
                 codeblock = rest.lstrip("\n")   # Remove lexer declaration line.
                 formatter_opts = self.extras['code-color'] or {}
-        
+
         # Use pygments only if not using the highlightjs-lang extra
         if lexer_name and "highlightjs-lang" not in self.extras:
             def unhash_code(codeblock):
@@ -1906,6 +1906,7 @@ class Markdown(object):
 
     _strong_re = re.compile(r"(\*\*|__)(?=\S)(.+?[*_]*)(?<=\S)\1", re.S)
     _em_re = re.compile(r"(\*|_)(?=\S)(.+?)(?<=\S)\1", re.S)
+    _u_re = re.compile(r"__(?=\S)(.+?[*_]*)(?<=\S)__", re.S)
     _code_friendly_strong_re = re.compile(r"\*\*(?=\S)(.+?[*_]*)(?<=\S)\*\*", re.S)
     _code_friendly_em_re = re.compile(r"\*(?=\S)(.+?)(?<=\S)\*", re.S)
     def _do_italics_and_bold(self, text):
@@ -1916,6 +1917,11 @@ class Markdown(object):
         else:
             text = self._strong_re.sub(r"<strong>\2</strong>", text)
             text = self._em_re.sub(r"<em>\2</em>", text)
+
+        # add underline support
+        if "underline" in self.extras:
+            text = self._u_re.sub(r"<u>\1</u>", text)
+
         return text
 
     # "smarty-pants" extra: Very liberal in interpreting a single prime as an
